@@ -1,0 +1,32 @@
+body {
+    font-family: "sans-serif";
+    font-size: 14px;
+    line-height: 1.5;
+    padding:32px;
+    background-color: white;
+}
+h1,
+p{
+    margin-top:0px;
+    margin-bottom: 16px;
+}
+h1, h2, h3,h4,h5, h6{
+    line-height: 1.25;
+}
+h1{
+    padding-bottom: 0.3em;
+    font-size: 2em;
+    border-bottom: 1px solid rgb(216, 222, 228);
+}
+a{
+    text-underline-offset: 0.2rem;
+}
+code {
+    font-size: 0.85em;
+    background-color: rgb(247, 247, 247);
+    padding: 0.2em;
+}
+hr {
+    height: 4px;
+    background-color: rgb(231, 231, 231);
+}
