@@ -1,4 +1,4 @@
-package org.netbeans.modules.markdown.editor.lexer.parser;
+package org.netbeans.modules.markdown.editor.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.netbeans.modules.markdown.editor.parser.astnodes.*;
@@ -101,7 +102,7 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
 
                 Token token = context.HEADER().getSymbol();
                 int pos = token.getText().indexOf("# ") + 1;
-                int htype = Math.max(pos, 6);
+                int htype = Math.min(pos, 6);
                 String content = token.getText().substring(pos);
                 astMarkdownfile.addMdElement(new Header(token.getStartIndex(), token.getStopIndex() + 1, content, htype));
             }
@@ -188,6 +189,27 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
                 }
                 BlockCode element = new BlockCode(startToken.getStartIndex(), endToken.getStopIndex() + 1, text, lang);
                 addNodeToAST(element);
+            }
+
+            @Override
+            public void exitParagraph(MarkdownAntlrParser.ParagraphContext context){
+                String text = "";
+                Token startToken = context.getStart();
+                Token endToken = context.getStop();
+
+                for (ParseTree child : context.children){
+                    if (child == null){
+                        continue;
+                    }
+                    String paragraphText = child.getText();
+                    text += paragraphText;
+                }
+                
+                Scalar element = new Scalar(startToken.getStartIndex(), endToken.getStopIndex() + 1, text);
+                ArrayList<ASTNode> list = new ArrayList<>();
+                list.add(element);
+                Paragraph par = new Paragraph(startToken.getStartIndex(), endToken.getStopIndex() + 1, list);
+                addNodeToAST(par);
             }
 
 //            @Override

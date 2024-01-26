@@ -60,7 +60,7 @@ import org.netbeans.core.spi.multiview.text.MultiViewEditorElement;
 import org.netbeans.modules.markdown.editor.lexer.MarkdownLexer;
 import org.netbeans.modules.markdown.editor.lexer.MarkdownTokenId;
 import org.netbeans.modules.markdown.editor.lexer.MarkdownTokenId.MarkdownLanguageHierarchy;
-import org.netbeans.modules.markdown.editor.lexer.parser.MarkdownParser;
+import org.netbeans.modules.markdown.editor.parser.MarkdownParser;
 
 /**
  *

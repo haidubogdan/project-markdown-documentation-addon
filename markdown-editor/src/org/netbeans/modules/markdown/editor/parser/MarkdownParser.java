@@ -1,4 +1,4 @@
-package org.netbeans.modules.markdown.editor.lexer.parser;
+package org.netbeans.modules.markdown.editor.parser;
 
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.parsing.api.Snapshot;

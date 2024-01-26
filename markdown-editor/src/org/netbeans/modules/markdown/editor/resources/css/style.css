@@ -19,7 +19,11 @@ h1{
     border-bottom: 1px solid rgb(216, 222, 228);
 }
 a{
-    text-underline-offset: 0.2rem;
+  color:#5a7fca;
+  text-decoration:none;
+}
+pre {
+  background: #f7f7f7;
 }
 code {
     font-size: 0.85em;
