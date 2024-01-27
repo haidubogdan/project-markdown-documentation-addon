@@ -22,10 +22,17 @@ import javax.swing.JToolBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.html.HTML;
 import javax.swing.text.html.StyleSheet;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
@@ -221,15 +228,7 @@ public class MarkdownViewerElement implements MultiViewElement {
                 Rectangle vis = viewer.getVisibleRect();
 
                 MarkdownParserResult result = MarkdownParser.getParserResult(dataObject.getPrimaryFile());
-                MarkdownFile astnFile = result.getAstnMarkdownFile();
-                String html;
-                if (astnFile != null) {
-                    ViewerVisitor viewerVisitor = new ViewerVisitor();
-                    viewerVisitor.scan(astnFile);
-                    html = viewerVisitor.getHtmlOutput();
-                } else {
-                    html = "<h1>Hello world</h1>";
-                }
+                String html = result.convertedHtmlText;
 
                 String stylesheet = getStyleSheetContent("style");
                 Reader htmlReader = new StringReader("<HTML><head><style>" + stylesheet + "</style></head><BODY>" + html + "</BODY></HTML>");
@@ -284,7 +283,6 @@ public class MarkdownViewerElement implements MultiViewElement {
             }
             return sheet;
         } catch (Exception ex) {
-            ex.printStackTrace();
             return null;
         }
     }
@@ -317,5 +315,54 @@ public class MarkdownViewerElement implements MultiViewElement {
                 HtmlBrowser.URLDisplayer.getDefault().showURL(evt.getURL());
             }
         }
+    }
+
+    static class BASE64HTMLEditorKit extends HTMLEditorKit {
+
+//        private static HTMLFactory factory = null;
+//
+//        @Override
+//        public ViewFactory getViewFactory() {
+//            if (factory == null) {
+//                factory = new HTMLFactory() {
+//
+//                    @Override
+//                    public View create(Element elem) {
+//                        AttributeSet attrs = elem.getAttributes();
+//                        Object elementName = attrs.getAttribute(AbstractDocument.ElementNameAttribute);
+//                        Object o = (elementName != null) ? null : attrs.getAttribute(StyleConstants.NameAttribute);
+//                        if (o instanceof HTML.Tag) {
+//                            HTML.Tag kind = (HTML.Tag) o;
+//                            if (kind == HTML.Tag.IMG) {
+//                                // HERE is the call to the special class...
+//                                //return new BASE64ImageView(elem);
+//                                int x = 1;
+//                            }
+//                        }
+//                        return super.create(elem);
+//                    }
+//                };
+//            }
+//            return factory;
+//        }
+
+//        private void loadImage() {
+//            String b64 = getBASE64Image();
+//            BufferedImage newImage = null;
+//            try (ByteArrayInputStream bais = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(b64))) {
+//                newImage = ImageIO.read(bais);
+//            } catch (IOException ex) {
+//
+//    }
+//    image = newImage;
+//        }
+//
+//        private String getBASE64Image() {
+//            String src = (String) getElement().getAttributes().getAttribute(HTML.Attribute.SRC);
+//            if (src == null) {
+//                return null;
+//            }
+//            return src.replaceFirst("data:image/png;base64,", "");
+//        }
     }
 }

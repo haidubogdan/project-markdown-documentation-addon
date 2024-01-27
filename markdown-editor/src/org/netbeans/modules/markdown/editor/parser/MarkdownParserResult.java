@@ -32,6 +32,7 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
     public final List<DefaultError> errors = new ArrayList<>();
     public final Map<String, Reference> references = new TreeMap<>();
     public MarkdownFile astMarkdownfile = null;
+    public String convertedHtmlText = "";
     public static final Reference EOF = new Reference(ReferenceType.TOKEN, "EOF", OffsetRange.NONE); //NOI18N
     volatile boolean finished = false;
 
@@ -80,265 +81,193 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
         astMarkdownfile = new MarkdownFile(0, getSnapshot().getText().length());
 
         return new MarkdownAntlrParserBaseListener() {
-            ArrayList<ListItem> mdListItems = new ArrayList<>();
-            ListItem bufferListItem = null;
-            MdLine mdLine = null;
+            StringBuilder bufferText = new StringBuilder();
+            StringBuilder htmlText = new StringBuilder();
+            boolean inListItem;
 
             @Override
-            public void enterFile(MarkdownAntlrParser.FileContext context){
+            public void enterFile(MarkdownAntlrParser.FileContext context) {
                 int x = 1;
             }
-            
+
             @Override
-            public void exitFile(MarkdownAntlrParser.FileContext context){
+            public void exitFile(MarkdownAntlrParser.FileContext context) {
                 int x = 1;
+                convertedHtmlText = htmlText.toString();
             }
+
             @Override
             public void exitHeader(MarkdownAntlrParser.HeaderContext context) {
+                htmlText.append("<h1>");
+                htmlText.append(bufferText);
+                //reset
+                bufferText.setLength(0);
+                htmlText.append("</h1>\n");
+            }
 
-                if (context.HEADER() == null || context.HEADER().getSymbol() == null) {
-                    return;
+            @Override
+            public void enterBold(MarkdownAntlrParser.BoldContext context) {
+                bufferText.append("<b>");
+            }
+
+            @Override
+            public void exitBold(MarkdownAntlrParser.BoldContext context) {
+                bufferText.append("</b>");
+            }
+
+            @Override
+            public void enterItalic(MarkdownAntlrParser.ItalicContext context) {
+                bufferText.append("<em>");
+            }
+
+            @Override
+            public void exitItalic(MarkdownAntlrParser.ItalicContext context) {
+                bufferText.append("</em>");
+            }
+
+            @Override
+            public void exitSimpleText(MarkdownAntlrParser.SimpleTextContext context) {
+                for (ParseTree child : context.children) {
+                    if (child == null) {
+                        continue;
+                    }
+                    bufferText.append(child.getText());
                 }
-
-                Token token = context.HEADER().getSymbol();
-                int pos = token.getText().indexOf("# ") + 1;
-                int htype = Math.min(pos, 6);
-                String content = token.getText().substring(pos);
-                astMarkdownfile.addMdElement(new Header(token.getStartIndex(), token.getStopIndex() + 1, content, htype));
             }
 
             @Override
             public void exitSetTextHeader(MarkdownAntlrParser.SetTextHeaderContext context) {
-
-                if (context.textFragmentConcat()!= null || context.textFragmentConcat().getText() == null){
-                    return;
+                htmlText.append("<h");
+                String htmlType;
+                if (context.SETTEXT_H1_UNDERLINE() != null) {
+                    htmlType = "1";
+                } else {
+                    htmlType = "2";
                 }
-
-                Token headerTextToken = context.textFragmentConcat().TEXT_FRAGMENT().get(0).getSymbol();
-                int headerType = 2;
-
-                if (context.SETTEXT_H1_UNDERLINE()!= null){
-                    headerType = 1;
-                }
-
-                astMarkdownfile.addMdElement(new Header(headerTextToken.getStartIndex(),
-                        headerTextToken.getStopIndex() + 1, context.textFragmentConcat().getText(),
-                        headerType));
+                htmlText.append(htmlType);
+                htmlText.append(">");
+                htmlText.append(bufferText);
+                //reset
+                bufferText.setLength(0);
+                htmlText.append("</h");
+                htmlText.append(htmlType);
+                htmlText.append(">\n");
             }
-            
-//            @Override
-//            public void enterLine(MarkdownAntlrParser.LineContext context) {
-//                Token token = context.getStart();
-//                mdLine = new MdLine(token.getStartIndex(), token.getStopIndex() + 1, new ArrayList<>());
-//            }
-//
-//            @Override
-//            public void exitLine(MarkdownAntlrParser.LineContext context) {
-//                astMarkdownfile.addMdElement(mdLine);
-//                mdLine = null;
-//            }
 
             @Override
             public void exitHtml(MarkdownAntlrParser.HtmlContext context) {
-                if (context.HTML() == null || context.HTML().getSymbol() == null) {
-                    return;
-                }
-
-                Token token = context.HTML().getSymbol();
-                Scalar element = new Scalar(token.getStartIndex(), token.getStopIndex() + 1, token.getText());
-                addNodeToAST(element);
+                bufferText.append(context.HTML().getText());
             }
-
-//            @Override
-//            public void exitRawText(MarkdownAntlrParser.RawTextContext context) {
-//                if (context.RAW_TEXT() == null || context.RAW_TEXT().getSymbol() == null) {
-//                    return;
-//                }
-//
-//                Token token = context.RAW_TEXT().getSymbol();
-//                Scalar element = new Scalar(token.getStartIndex(), token.getStopIndex() + 1, token.getText());
-//                addNodeToAST(element);
-//            }
 
             @Override
             public void exitCode(MarkdownAntlrParser.CodeContext context) {
-                if (context.CODE() == null || context.CODE().getSymbol() == null) {
+                if (context.inlineText() == null) {
                     return;
                 }
+                String content = bufferText.toString();
+                bufferText.setLength(0);
+                bufferText.append("<code>");
+                bufferText.append(content);
+                bufferText.append("</code>");
+            }
 
-                Token token = context.CODE().getSymbol();
-                Code element = new Code(token.getStartIndex(), token.getStopIndex() + 1, token.getText());
-                addNodeToAST(element);
+            @Override
+            public void exitNl(MarkdownAntlrParser.NlContext context) {
+                bufferText.append("\n");
             }
 
             @Override
             public void exitBlockCode(MarkdownAntlrParser.BlockCodeContext context) {
-                if (context.BLOCK_CODE() == null) {
-                    return;
+                String content = bufferText.toString();
+                bufferText.setLength(0);
+                String lang = "md";
+                if (context.lang != null) {
+                    lang = context.lang.getText();
                 }
-
-                String text = "";
-                for (TerminalNode token : context.BLOCK_CODE()) {
-                    text += token.getText();
-                }
-                Token startToken = context.BLOCK_CODE_START().getSymbol();
-                Token endToken = context.BLOCK_CODE_END().getSymbol();
-                String lang = null;
-                if (context.LANG_TYPE() != null) {
-                    lang = context.LANG_TYPE().getText();
-                }
-                BlockCode element = new BlockCode(startToken.getStartIndex(), endToken.getStopIndex() + 1, text, lang);
-                addNodeToAST(element);
+                bufferText.append("<pre><code  class='lang-");
+                bufferText.append(lang);
+                bufferText.append("'>\n");
+                bufferText.append(content);
+                bufferText.append("</code></pre>\n");
             }
 
             @Override
-            public void exitParagraph(MarkdownAntlrParser.ParagraphContext context){
-                String text = "";
-                Token startToken = context.getStart();
-                Token endToken = context.getStop();
-
-                for (ParseTree child : context.children){
-                    if (child == null){
-                        continue;
+            public void exitParagraph(MarkdownAntlrParser.ParagraphContext context) {
+                if (bufferText.length() > 0) {
+                    htmlText.append("<p>");
+                    htmlText.append(bufferText);
+                    if (!inListItem){
+                        bufferText.setLength(0);
                     }
-                    String paragraphText = child.getText();
-                    text += paragraphText;
+                    htmlText.append("</p>\n");
                 }
-                
-                Scalar element = new Scalar(startToken.getStartIndex(), endToken.getStopIndex() + 1, text);
-                ArrayList<ASTNode> list = new ArrayList<>();
-                list.add(element);
-                Paragraph par = new Paragraph(startToken.getStartIndex(), endToken.getStopIndex() + 1, list);
-                addNodeToAST(par);
             }
 
-//            @Override
-//            public void exitBreakLine(MarkdownAntlrParser.BreakLineContext context) {
-//                if (context.BREAK_LINE() == null || context.BREAK_LINE().getSymbol() == null) {
-//                    return;
-//                }
-//
-//                Token token = context.BREAK_LINE().getSymbol();
-//                BreakLine element = new BreakLine(token.getStartIndex(), token.getStopIndex() + 1, token.getText());
-//                addNodeToAST(element);
-//            }
+            @Override
+            public void exitBreakLine(MarkdownAntlrParser.BreakLineContext context) {
+                htmlText.append("<hr>\n");
+            }
 
             @Override
             public void exitTextEffect(MarkdownAntlrParser.TextEffectContext context) {
-                if (context.BOLD() != null && context.BOLD_START() != null) {
-                    String text = "";
-                    for (TerminalNode token : context.BOLD()) {
-                        text += token.getText();
-                    }
 
-                    addNodeToAST(new TextEffect(context.BOLD_START().getSymbol().getStartIndex(),
-                            context.BOLD_END().getSymbol().getStopIndex(), TextEffect.Type.BOLD, text));
-                } else if (context.ITALIC() != null) {
-                    Token token = context.ITALIC().getSymbol();
-                    if (token.getText().length() < 2) {
-                        return;
-                    }
-                    String text = token.getText().substring(1, token.getText().length() - 1);
-                    addNodeToAST(new TextEffect(token.getStartIndex(),
-                            token.getStopIndex(), TextEffect.Type.ITALIC, text));
-                } else if (context.STRIKETHROUGH()!= null) {
-                    Token token = context.STRIKETHROUGH().getSymbol();
-                    if (token.getText().length() < 4) {
-                        return;
-                    }
-                    String text = token.getText().substring(2, token.getText().length() - 2);
-                    addNodeToAST(new TextEffect(token.getStartIndex(),
-                            token.getStopIndex(), TextEffect.Type.STRIKETHROUGH, text));
-                }
             }
 
             @Override
             public void exitLink(MarkdownAntlrParser.LinkContext context) {
-                if (context.HYPER_LINK_LABEL() == null || context.HYPER_LINK_LABEL().getSymbol() == null) {
-                    return;
+                boolean isImage = context.EXCL() != null;
+                String label = "";
+                if (context.label().labelText() != null) {
+                    for (ParseTree child : context.label().labelText().children) {
+                        label += child.getText();
+                    }
                 }
-
-                Token label = context.HYPER_LINK_LABEL().getSymbol();
-                Token link = context.HYPER_LINK().getSymbol();
-                boolean isImage = label.getText().startsWith("!");
-                int labelTrimStart = 1;
-                if (isImage){
-                    labelTrimStart = 2;
+                String url = "";
+                if (context.path().labelText() != null) {
+                    for (ParseTree child : context.path().labelText().children) {
+                        url += child.getText();
+                    }
                 }
-                String labelText = label.getText().substring(labelTrimStart, label.getText().length() - 1);
-                int start = link.getStartIndex();
-                String linkText = link.getText().substring(1, link.getText().length() - 1);
-                int end = label.getStopIndex() + 1;
-                HyperLink linkElement = new HyperLink(start, end, linkText, labelText, isImage);
-                addNodeToAST(linkElement);
-            }
-
-            @Override
-            public void exitBoldLink(MarkdownAntlrParser.BoldLinkContext context) {
-                if (context.HYPER_LINK_LABEL() == null || context.HYPER_LINK_LABEL().getSymbol() == null) {
-                    return;
+                if (isImage) {
+                    bufferText.append("<img src='");
+                    bufferText.append(url);
+                    bufferText.append("' />");
+                } else {
+                    bufferText.append("<a href='");
+                    bufferText.append(url);
+                    bufferText.append("'>");
+                    bufferText.append(label);
+                    bufferText.append("</a>");
                 }
-
-                Token label = context.HYPER_LINK_LABEL().getSymbol();
-                Token link = context.HYPER_LINK().getSymbol();
-                boolean isImage = label.getText().startsWith("!");
-                int labelTrimStart = 1;
-                if (isImage){
-                    labelTrimStart = 2;
-                }
-                String labelText = label.getText().substring(labelTrimStart, label.getText().length() - 1);
-                int start = link.getStartIndex();
-                String linkText = link.getText().substring(1, link.getText().length() - 1);
-                int end = label.getStopIndex() + 1;
-                HyperLink linkElement = new HyperLink(start, end, linkText, labelText, TextEffect.Type.BOLD, isImage);
-                addNodeToAST(linkElement);
             }
 
             @Override
             public void enterList(MarkdownAntlrParser.ListContext context) {
-                this.mdListItems = new ArrayList<>();
+                htmlText.append("<ul>\n");
             }
 
             @Override
             public void exitList(MarkdownAntlrParser.ListContext context) {
-                Token token = context.getStart();
-                MdList MdList = new MdList(token.getStartIndex(), token.getStopIndex() + 1, this.mdListItems);
-                addNodeToAST(MdList);
+                htmlText.append("</ul>\n");
             }
 
             @Override
             public void enterListItem(MarkdownAntlrParser.ListItemContext context) {
-                Token token = context.getStart();
-                bufferListItem = new ListItem(token.getStartIndex(), token.getStopIndex() + 1, new ArrayList<>());
+                inListItem = true;
             }
 
             @Override
             public void exitListItem(MarkdownAntlrParser.ListItemContext context) {
-                this.mdListItems.add(bufferListItem);
-                bufferListItem = null;
-            }
-
-            public void addReference(ReferenceType type, Token token) {
-                OffsetRange range = new OffsetRange(token.getStartIndex(), token.getStopIndex() + 1);
-                String name = token.getText();
-                Reference ref = new Reference(type, name, range);
-                references.put(ref.name, ref);
-            }
-
-            private void addNodeToAST(MdElement element) {
-                if (bufferListItem != null) {
-                    bufferListItem.addContentItem(element);
-                } else if (mdLine != null) {
-                    mdLine.addContentItem(element);
-                } else {
-                    astMarkdownfile.addMdElement(element);
+                inListItem = false;
+                if (bufferText.length() == 0) {
+                    return;
                 }
+                htmlText.append("    <li>");
+                htmlText.append(bufferText);
+                bufferText.setLength(0);
+                htmlText.append("</li>\n");
             }
         };
-    }
-
-    private void checkReferences() {
-
     }
 
     @Override

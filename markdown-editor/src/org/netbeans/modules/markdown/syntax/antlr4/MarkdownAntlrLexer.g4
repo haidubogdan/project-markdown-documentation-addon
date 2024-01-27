@@ -6,99 +6,79 @@ lexer grammar MarkdownAntlrLexer;
 
 options { superClass = LexerAdaptor; }
  
-tokens { TOKEN_REF , RULE_REF , LEXER_CHAR_SET }
+tokens { 
+ NL,
+ RAW_TEXT,
+ HTML,
+ WS,
+ ATTR_COMMENT,
+ EXCL,
+ SQ_PAR_OPEN   
+}
   
-
-
-NL :[\n\r];
-
-HEADER : (('#')+[ ]) ~[\n\r]*;
-
-BOLD_START: DoubleAsterix -> pushMode(INSIDE_BOLD);
-
-fragment DoubleAsterix : '**' ;
-
-ITALIC: SgAsterix .*? (SgAsterix | EOF);
-
-fragment SgAsterix : '*' ;
-
-fragment SINGLE_LINE_RAW_TEXT : {this.IsNewLineOrStart()}? ~[\n\r];
-
-ITALIC_2: '_' .*? ('_' | EOF) ->type(ITALIC);
-
-STRIKETHROUGH: '~~' .*? ('~~' | EOF);
-
-
-CODE : Backtick {this._input.LA(2)!='`' && this._input.LA(3)!='`'}? (Backtick | ~[\r\n])* Backtick;
-
-CODE2 : '``' {this._input.LA(3)!='`'}? .*? ('``' | EOF)->type(CODE);
-
-fragment Backtick : '`' ;
-
-BLOCK_CODE_START : TriBacktick->pushMode(INSIDE_BLOCK_CODE);
-
-fragment TriBacktick : '```';
-
-//images will be included in this token
-HYPER_LINK_LABEL : '!'? '[' ~('\r' | '\n' | '[' | '(' | ')')* (']' | EOF)
-    ;
-HYPER_LINK  : '(' ~('\r' | '\n' | '(' | '[' | ']')* (')' | EOF)
-    ;
-
-//Setext-style headers are “underlined” using equal signs (for first-level headers) and dashes (for second-level headers) 
-SETTEXT_H1_UNDERLINE: {this.IsNewLineOrStart()}? ('=')+ [ ]* {this.peekNextChar('\n')}?;
-
-SETTEXT_H2_UNDERLINE: {this.IsNewLineOrStart()}? ('-')+ [ ]* {this.peekNextChar('\n')}?;
-
-HORIZONTAL_RULE_HYPHEN : {this.IsNewLineOrStart()}? HyphenHr {this.peekNextChar('\n')}?;
-HORIZONTAL_RULE : {this.IsNewLineOrStart()}? AxterixHr {this.peekNextChar('\n')}?;
-
-fragment HyphenHr : (' ')* ('-')+ (' ')* ('-')+ (' ')* ('-')+ [ -]*;
-fragment AxterixHr : ('***')+[*]*;
-
-LIST_ITEM_MARKER : {this.IsNewLineOrStart()}? ListItemMarker;  
-
 fragment ListItemMarker
     : ([ \t]* '- ')
     | ([ \t]* '* ')
     | ([ \t]* [0-9]+ '. ')
     ;
 
-HTML
-   : HtmlElement
-   ;    
-    
+fragment DoubleAsterix : '**' ;
+fragment SgAsterix : '*' ;
+
+fragment Backtick_3 : '```';
+fragment Backtick_2 : '``';
+
 fragment HtmlElement
     : '<!--' .*? ( '-->' | EOF )
     | '<' .*? ('/>' | '>' | EOF )
     | '</' .*? ('>' | EOF )
     ;
 
-TEXT_FRAGMENT : TextFragment ;
+fragment Identifier 
+    : [a-zA-Z_\u0080-\ufffe][a-zA-Z0-9_\u0080-\ufffe-]*;
 
-fragment TextFragment :
-    ('a'..'z'|'A'..'Z')+
-    | . ;
+fragment NewLine : [\r\n];
 
+HEADER_HASH : ('#')+->mode(LINE_TEXT);
+LIST_ITEM_MARKER : ListItemMarker->mode(LINE_TEXT);
 
-//modes
+D_ASTERIX : DoubleAsterix->mode(LINE_TEXT);
+S_ASTERIX : SgAsterix->mode(LINE_TEXT);
 
-mode INSIDE_BOLD;
+BACKTICK_3 : Backtick_3->mode(LINE_TEXT);
+BACKTICK_2 : Backtick_2->mode(LINE_TEXT);
 
-BOLD_HYPER_LINK_LABEL : '!'? '[' ~('\r' | '\n' | '[' | '(' | ')')* (']' | EOF) -> type(HYPER_LINK_LABEL)
-    ;
-BOLD_HYPER_LINK  : '(' ~('\r' | '\n' | '(' | '[' | ']')* (')' | EOF) -> type(HYPER_LINK)
-    ;
-BOLD_END : DoubleAsterix->popMode;
+SETTEXT_H1_UNDERLINE : ('=')+ [ ]*;
+SETTEXT_H2_UNDERLINE : ('-')+ [ ]*;
 
-BOLD_NL : NL ->type(NL), popMode;
-BOLD : ~[\r\n*[(]+;
+HORIZONTAL_RULE_HYPHEN : (' ')* ('-')+ (' ')* ('-')+ (' ')* ('-')+ [ -]*;
+HORIZONTAL_RULE : ('***')+[*]*;
 
-SINGLE_PAR : ('(' | '[') ->type(BOLD);
+EXCL : '!' ->mode(LINE_TEXT);
+S_SQ_PAR_OPEN : '[' ->type(SQ_PAR_OPEN),mode(LINE_TEXT);
 
-mode INSIDE_BLOCK_CODE;
+HTML : HtmlElement->mode(LINE_TEXT);
+LETTER : [a-zA-Z]->more, mode(LINE_TEXT);
+NL : NewLine;
+WS : [ ]+;
 
-LANG_TYPE : {this.isFirstCodeBlockElement()}? ~[\r\n]+;
-BLOCK_CODE : ~('`' | '\r' | '\n')+;
-BLOCK_CODE_END : TriBacktick->popMode;
-BLOCK_CODE_ESCAPE : [\r\n`] ->type(BLOCK_CODE);
+RAW_TEXT : . ;
+
+mode LINE_TEXT;
+
+LINE_EXCL : '!' ->type(EXCL);
+SQ_PAR_OPEN : '[';
+SQ_PAR_CLOSE : ']';
+R_PAR_OPEN : '(';
+R_PAR_CLOSE : ')';
+
+LINE_D_ASTERIX : DoubleAsterix->type(D_ASTERIX);
+LINE_S_ASTERIX : SgAsterix->type(S_ASTERIX);
+LINE_BACKTICK_3 : Backtick_3->type(BACKTICK_3);
+LINE_BACKTICK_2 : Backtick_2->type(BACKTICK_2);
+LINE_HTML : HtmlElement->type(HTML);
+IDENTIFIER : Identifier;
+LINE_NL : NewLine->type(NL),mode(DEFAULT_MODE);
+LINE_WS : [ ]+->type(WS);
+LINE_RAW_TEXT : . ->type(RAW_TEXT);
+LINE_EOF : EOF ->mode(DEFAULT_MODE);

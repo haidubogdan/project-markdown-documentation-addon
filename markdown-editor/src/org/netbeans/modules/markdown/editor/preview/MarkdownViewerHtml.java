@@ -217,15 +217,7 @@ public class MarkdownViewerHtml implements MultiViewElement {
                 Rectangle vis = viewer.getVisibleRect();
 
                 MarkdownParserResult result = MarkdownParser.getParserResult(dataObject.getPrimaryFile());
-                MarkdownFile astnFile = result.getAstnMarkdownFile();
-                String html;
-                if (astnFile != null) {
-                    ViewerVisitor viewerVisitor = new ViewerVisitor();
-                    viewerVisitor.scan(astnFile);
-                     html = viewerVisitor.getHtmlOutput();
-                } else {
-                    html = "<h1>Hello world</h1>";
-                }
+                String html = result.convertedHtmlText;
                
                 Reader htmlReader = new StringReader(html);
                 HTMLEditorKit kit = new HTMLEditorKit();

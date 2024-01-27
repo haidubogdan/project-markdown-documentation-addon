@@ -218,7 +218,7 @@
             <public-packages>
                 <package>org.netbeans.modules.markdown.editor</package>
                 <package>org.netbeans.modules.markdown.editor.lexer</package>
-                <package>org.netbeans.modules.markdown.editor.lexer.parser</package>
+                <package>org.netbeans.modules.markdown.editor.parser</package>
                 <package>org.netbeans.modules.markdown.editor.parser.astnodes</package>
                 <package>org.netbeans.modules.markdown.editor.parser.astnodes.visitors</package>
                 <package>org.netbeans.modules.markdown.editor.preview</package>

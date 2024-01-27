@@ -14,33 +14,41 @@ parser grammar MarkdownAntlrParser;
 options { tokenVocab = MarkdownAntlrLexer; }
 
 file: main_element+ EOF ;
-main_element: header | setTextHeader | paragraph | NL;
+main_element: header | setTextHeader | list | paragraph | breakLine | NL;
 
 paragraph: element+ (NL | EOF);
 
-element: breakLine
-| boldLink    
+element:
+ link  
 | textEffect
-| link
 | code
 | blockCode
 | list
 | html
-| textFragmentConcat
+| textElement
 ;
 
 list: listItem+;
 listItem : LIST_ITEM_MARKER element+ NL | LIST_ITEM_MARKER paragraph;
 
-header: HEADER;
-setTextHeader: textFragmentConcat NL (SETTEXT_H1_UNDERLINE | SETTEXT_H2_UNDERLINE);
+header: HEADER_HASH WS simpleText;
+setTextHeader: textElement NL (SETTEXT_H1_UNDERLINE | SETTEXT_H2_UNDERLINE);
 breakLine : HORIZONTAL_RULE;
-boldLink : BOLD_START HYPER_LINK_LABEL HYPER_LINK BOLD_END;
-textEffect : BOLD_START BOLD+ BOLD_END
-    | ITALIC | STRIKETHROUGH;
+textEffect : bold | italic;
+bold : D_ASTERIX textElement D_ASTERIX;
+italic : S_ASTERIX textElement S_ASTERIX;
+textElement : textEffect | simpleText | link;
+simpleText : (IDENTIFIER | RAW_TEXT | WS)+;
 html: HTML;
-textFragment : TEXT_FRAGMENT;
-textFragmentConcat : TEXT_FRAGMENT+;
-code : CODE;
-blockCode : BLOCK_CODE_START LANG_TYPE? BLOCK_CODE+ BLOCK_CODE_END;
-link: HYPER_LINK_LABEL HYPER_LINK;
+//simplified version for the moment
+code : BACKTICK_2 inlineText BACKTICK_2;
+inlineText : (textElement | html)+;
+//could use a mode
+blockCode : BACKTICK_3 lang=IDENTIFIER? NL codeText NL? BACKTICK_3;
+codeText : (textElement | html | nl)+;
+nl : NL;
+
+link: EXCL? label path;
+label: SQ_PAR_OPEN labelText SQ_PAR_CLOSE;
+path: R_PAR_OPEN labelText R_PAR_CLOSE;
+labelText : (IDENTIFIER | RAW_TEXT | WS)+;

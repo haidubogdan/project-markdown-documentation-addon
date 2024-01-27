@@ -54,24 +54,6 @@ public class MdAntlrLexerTestBase extends NbTestCase {
 
         for (Token token : tokenStream.getTokens()) {
             switch (token.getType()) {
-                case MarkdownAntlrLexer.TEXT_FRAGMENT:
-                    result.append("TEXT_FRAGMENT ");
-                    break;
-                case MarkdownAntlrLexer.BLOCK_CODE_START:
-                    result.append("BLOCK_CODE_START ");
-                    break;
-                case MarkdownAntlrLexer.LANG_TYPE:
-                    result.append("LANG_TYPE ");
-                    break;
-                case MarkdownAntlrLexer.BLOCK_CODE:
-                    result.append("BLOCK_CODE ");
-                    break;
-                case MarkdownAntlrLexer.BLOCK_CODE_END:
-                    result.append("BLOCK_CODE_END ");
-                    break;
-                case MarkdownAntlrLexer.HEADER:
-                    result.append("HEADER ");
-                    break;
                 case MarkdownAntlrLexer.SETTEXT_H1_UNDERLINE:
                     result.append("HEADER_DASH1 ");
                     break;

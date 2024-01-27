@@ -100,16 +100,6 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitBreakLine(MarkdownAntlrParser.BreakLineContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MarkdownAntlrParser#boldLink}.
-	 * @param ctx the parse tree
-	 */
-	void enterBoldLink(MarkdownAntlrParser.BoldLinkContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MarkdownAntlrParser#boldLink}.
-	 * @param ctx the parse tree
-	 */
-	void exitBoldLink(MarkdownAntlrParser.BoldLinkContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#textEffect}.
 	 * @param ctx the parse tree
 	 */
@@ -119,6 +109,46 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTextEffect(MarkdownAntlrParser.TextEffectContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#bold}.
+	 * @param ctx the parse tree
+	 */
+	void enterBold(MarkdownAntlrParser.BoldContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#bold}.
+	 * @param ctx the parse tree
+	 */
+	void exitBold(MarkdownAntlrParser.BoldContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#italic}.
+	 * @param ctx the parse tree
+	 */
+	void enterItalic(MarkdownAntlrParser.ItalicContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#italic}.
+	 * @param ctx the parse tree
+	 */
+	void exitItalic(MarkdownAntlrParser.ItalicContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#textElement}.
+	 * @param ctx the parse tree
+	 */
+	void enterTextElement(MarkdownAntlrParser.TextElementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#textElement}.
+	 * @param ctx the parse tree
+	 */
+	void exitTextElement(MarkdownAntlrParser.TextElementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#simpleText}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimpleText(MarkdownAntlrParser.SimpleTextContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#simpleText}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimpleText(MarkdownAntlrParser.SimpleTextContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#html}.
 	 * @param ctx the parse tree
@@ -130,26 +160,6 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitHtml(MarkdownAntlrParser.HtmlContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MarkdownAntlrParser#textFragment}.
-	 * @param ctx the parse tree
-	 */
-	void enterTextFragment(MarkdownAntlrParser.TextFragmentContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MarkdownAntlrParser#textFragment}.
-	 * @param ctx the parse tree
-	 */
-	void exitTextFragment(MarkdownAntlrParser.TextFragmentContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MarkdownAntlrParser#textFragmentConcat}.
-	 * @param ctx the parse tree
-	 */
-	void enterTextFragmentConcat(MarkdownAntlrParser.TextFragmentConcatContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MarkdownAntlrParser#textFragmentConcat}.
-	 * @param ctx the parse tree
-	 */
-	void exitTextFragmentConcat(MarkdownAntlrParser.TextFragmentConcatContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#code}.
 	 * @param ctx the parse tree
 	 */
@@ -159,6 +169,16 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCode(MarkdownAntlrParser.CodeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#inlineText}.
+	 * @param ctx the parse tree
+	 */
+	void enterInlineText(MarkdownAntlrParser.InlineTextContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#inlineText}.
+	 * @param ctx the parse tree
+	 */
+	void exitInlineText(MarkdownAntlrParser.InlineTextContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#blockCode}.
 	 * @param ctx the parse tree
@@ -170,6 +190,26 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitBlockCode(MarkdownAntlrParser.BlockCodeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#codeText}.
+	 * @param ctx the parse tree
+	 */
+	void enterCodeText(MarkdownAntlrParser.CodeTextContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#codeText}.
+	 * @param ctx the parse tree
+	 */
+	void exitCodeText(MarkdownAntlrParser.CodeTextContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#nl}.
+	 * @param ctx the parse tree
+	 */
+	void enterNl(MarkdownAntlrParser.NlContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#nl}.
+	 * @param ctx the parse tree
+	 */
+	void exitNl(MarkdownAntlrParser.NlContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#link}.
 	 * @param ctx the parse tree
 	 */
@@ -179,4 +219,34 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLink(MarkdownAntlrParser.LinkContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#label}.
+	 * @param ctx the parse tree
+	 */
+	void enterLabel(MarkdownAntlrParser.LabelContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#label}.
+	 * @param ctx the parse tree
+	 */
+	void exitLabel(MarkdownAntlrParser.LabelContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#path}.
+	 * @param ctx the parse tree
+	 */
+	void enterPath(MarkdownAntlrParser.PathContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#path}.
+	 * @param ctx the parse tree
+	 */
+	void exitPath(MarkdownAntlrParser.PathContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#labelText}.
+	 * @param ctx the parse tree
+	 */
+	void enterLabelText(MarkdownAntlrParser.LabelTextContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#labelText}.
+	 * @param ctx the parse tree
+	 */
+	void exitLabelText(MarkdownAntlrParser.LabelTextContext ctx);
 }

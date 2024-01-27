@@ -27,8 +27,7 @@ public class MdUtils {
     }
 
     public static CommonTokenStream getTokenStream(String content) {
-        CharStream stream = new ANTLRInputStream(content);
-        MarkdownAntlrLexer lexer = new MarkdownAntlrLexer(stream);
+        MarkdownAntlrLexer lexer = new MarkdownAntlrLexer(CharStreams.fromString(content));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         tokens.fill();
         return tokens;
