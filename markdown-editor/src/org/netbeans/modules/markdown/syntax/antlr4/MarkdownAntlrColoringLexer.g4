@@ -47,9 +47,9 @@ BOLD_START: DoubleAsterix -> pushMode(INSIDE_BOLD);
 
 fragment DoubleAsterix : '**' ;
 
-ITALIC: SgAsterix .*? (SgAsterix | EOF);
+ITALIC: SgAsterix .*? (SgAsterix | EOF) ~[\n\r];
 
-ITALIC_2: '_' .*? ('_' | EOF) ->type(ITALIC);
+ITALIC_2: '_' .*? ('_' | EOF) ~[\n\r]->type(ITALIC);
 
 STRIKETHROUGH: '~~' .*? ('~~' | EOF);
 

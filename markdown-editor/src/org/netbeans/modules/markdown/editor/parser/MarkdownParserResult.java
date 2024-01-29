@@ -1,6 +1,13 @@
 package org.netbeans.modules.markdown.editor.parser;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,6 +29,7 @@ import org.netbeans.modules.markdown.editor.parser.astnodes.*;
 import org.netbeans.modules.markdown.syntax.antlr4.MarkdownAntlrLexer;
 import org.netbeans.modules.markdown.syntax.antlr4.MarkdownAntlrParser;
 import org.netbeans.modules.markdown.syntax.antlr4.MarkdownAntlrParserBaseListener;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -196,7 +204,7 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
                 if (bufferText.length() > 0) {
                     htmlText.append("<p>");
                     htmlText.append(bufferText);
-                    if (!inListItem){
+                    if (!inListItem) {
                         bufferText.setLength(0);
                     }
                     htmlText.append("</p>\n");
@@ -230,6 +238,12 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
                 }
                 if (isImage) {
                     bufferText.append("<img src='");
+                    if (url.startsWith("http")) {
+                        String encodedImage = getByteArrayFromImageURL(url);
+                        if (encodedImage != null) {
+                            url = encodedImage;
+                        }
+                    }
                     bufferText.append(url);
                     bufferText.append("' />");
                 } else {
@@ -299,6 +313,46 @@ public class MarkdownParserResult<T extends Parser> extends ParserResult {
             this.type = type;
             this.name = name;
             this.defOffset = defOffset;
+        }
+    }
+
+    private String getByteArrayFromImageURL(String imageUrl) {
+
+        try {
+            URL url = new URL(imageUrl);
+//             "data:image/svg;base64," +
+            return Base64.getEncoder().encodeToString(readAllBytes(url.openConnection().getInputStream()));
+        } catch (IOException e) {
+            Exceptions.printStackTrace(e);
+        }
+        return null;
+    }
+
+    public static byte[] readAllBytes(InputStream inputStream) throws IOException {
+        final int bufLen = 4 * 0x400; // 4KB
+        byte[] buf = new byte[bufLen];
+        int readLen;
+        IOException exception = null;
+
+        try {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                while ((readLen = inputStream.read(buf, 0, bufLen)) != -1) {
+                    outputStream.write(buf, 0, readLen);
+                }
+
+                return outputStream.toByteArray();
+            }
+        } catch (IOException e) {
+            exception = e;
+            throw e;
+        } finally {
+            if (exception == null) {
+                inputStream.close();
+            } else try {
+                inputStream.close();
+            } catch (IOException e) {
+                exception.addSuppressed(e);
+            }
         }
     }
 }
