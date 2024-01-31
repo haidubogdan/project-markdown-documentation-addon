@@ -81,20 +81,6 @@ public class MarkdownParserResultTest {
     }
 
     /**
-     * Test of getAstnMarkdownFile method, of class MarkdownParserResult.
-     */
-    @Test
-    public void testGetAstnMarkdownFile() {
-        System.out.println("getAstnMarkdownFile");
-        MarkdownParserResult instance = null;
-        MarkdownFile expResult = null;
-        MarkdownFile result = instance.getAstnMarkdownFile();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of createElementsListener method, of class MarkdownParserResult.
      */
     @Test
@@ -102,8 +88,8 @@ public class MarkdownParserResultTest {
         System.out.println("createElementsListener");
         MarkdownParserResult instance = null;
         ParseTreeListener expResult = null;
-        ParseTreeListener result = instance.createElementsListener();
-        assertEquals(expResult, result);
+        ///ParseTreeListener result = instance.createElementsListener();
+        //assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

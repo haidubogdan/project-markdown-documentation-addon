@@ -25,10 +25,12 @@
     <fontcolor name="header" foreColor="magenta">
         <font style="bold"/>
     </fontcolor>
-    <fontcolor name="code" foreColor="cyan"/>
+    <fontcolor name="code" foreColor="1EDFD0">
+        <font name="DejaVu Sans" size="12"/>
+    </fontcolor>
     <fontcolor name="li_item" foreColor="orange"/>
     <fontcolor name="html" foreColor="gray"/>
-    <fontcolor name="bold" foreColor="green">
+    <fontcolor name="bold" foreColor="e0a855">
         <font style="bold"/>
     </fontcolor>
     <fontcolor name="italic" foreColor="pink">
@@ -36,6 +38,6 @@
     </fontcolor>
     <fontcolor name="strikethrough" foreColor="red">
     </fontcolor>
-    <fontcolor name="link" foreColor="blue"/>
-    <fontcolor name="link_label" foreColor="orange"/>
+    <fontcolor name="link" foreColor="9999FF"/>
+    <fontcolor name="link_label" foreColor="3399FF"/>
 </fontscolors>

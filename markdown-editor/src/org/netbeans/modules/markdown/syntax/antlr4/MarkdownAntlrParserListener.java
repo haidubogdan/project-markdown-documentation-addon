@@ -30,6 +30,16 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitMain_element(MarkdownAntlrParser.Main_elementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#list}.
+	 * @param ctx the parse tree
+	 */
+	void enterList(MarkdownAntlrParser.ListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#list}.
+	 * @param ctx the parse tree
+	 */
+	void exitList(MarkdownAntlrParser.ListContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#paragraph}.
 	 * @param ctx the parse tree
 	 */
@@ -49,16 +59,6 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitElement(MarkdownAntlrParser.ElementContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MarkdownAntlrParser#list}.
-	 * @param ctx the parse tree
-	 */
-	void enterList(MarkdownAntlrParser.ListContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MarkdownAntlrParser#list}.
-	 * @param ctx the parse tree
-	 */
-	void exitList(MarkdownAntlrParser.ListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#listItem}.
 	 * @param ctx the parse tree
@@ -249,4 +249,14 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLabelText(MarkdownAntlrParser.LabelTextContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#textLine}.
+	 * @param ctx the parse tree
+	 */
+	void enterTextLine(MarkdownAntlrParser.TextLineContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#textLine}.
+	 * @param ctx the parse tree
+	 */
+	void exitTextLine(MarkdownAntlrParser.TextLineContext ctx);
 }

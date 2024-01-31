@@ -68,13 +68,14 @@ public enum MarkdownTokenId implements TokenId {
     CODE("code"),
     ITALIC("italic"),
     STRIKETHROUGH("strikethrough"),
+    BLOCK_QUOTE("blockquote"),
     LI("li_item"),
     NEWLINE("whitespace"),
     WHITESPACE("whitespace"),
     BOLD_HYPERLINK("link"),
     HYPER_LINK_LABEL("link_label"),
     HYPER_LINK("link"),
-    RAW_TEXT("html"),
+    RAW_TEXT("text"),
     ERROR("error");
 
     private final String category;

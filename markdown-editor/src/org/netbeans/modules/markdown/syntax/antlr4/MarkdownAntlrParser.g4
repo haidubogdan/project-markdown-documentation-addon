@@ -14,24 +14,22 @@ parser grammar MarkdownAntlrParser;
 options { tokenVocab = MarkdownAntlrLexer; }
 
 file: main_element+ EOF ;
-main_element: header | setTextHeader | list | paragraph | breakLine | NL;
+main_element: header | setTextHeader | blockCode | list | paragraph | breakLine;
 
-paragraph: element+ (NL | EOF);
+//nested items not treated
+list: (listItem NL*)+;
+paragraph: textLine;
 
 element:
- link  
-| textEffect
+ textElement
 | code
-| blockCode
-| list
 | html
-| textElement
 ;
 
-list: listItem+;
-listItem : LIST_ITEM_MARKER element+ NL | LIST_ITEM_MARKER paragraph;
 
-header: HEADER_HASH WS simpleText;
+listItem : LIST_ITEM_MARKER textLine;
+
+header: HEADER_HASH WS textLine;
 setTextHeader: textElement NL (SETTEXT_H1_UNDERLINE | SETTEXT_H2_UNDERLINE);
 breakLine : HORIZONTAL_RULE;
 textEffect : bold | italic;
@@ -52,3 +50,5 @@ link: EXCL? label path;
 label: SQ_PAR_OPEN labelText SQ_PAR_CLOSE;
 path: R_PAR_OPEN labelText R_PAR_CLOSE;
 labelText : (IDENTIFIER | RAW_TEXT | WS)+;
+
+textLine : element+ (NL | EOF);

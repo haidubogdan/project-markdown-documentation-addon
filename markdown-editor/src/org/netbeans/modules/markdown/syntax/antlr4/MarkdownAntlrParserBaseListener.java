@@ -43,6 +43,18 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterList(MarkdownAntlrParser.ListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitList(MarkdownAntlrParser.ListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterParagraph(MarkdownAntlrParser.ParagraphContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -62,18 +74,6 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitElement(MarkdownAntlrParser.ElementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterList(MarkdownAntlrParser.ListContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitList(MarkdownAntlrParser.ListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -302,6 +302,18 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLabelText(MarkdownAntlrParser.LabelTextContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTextLine(MarkdownAntlrParser.TextLineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTextLine(MarkdownAntlrParser.TextLineContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

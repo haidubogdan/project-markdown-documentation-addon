@@ -28,6 +28,8 @@ fragment SgAsterix : '*' ;
 fragment Backtick_3 : '```';
 fragment Backtick_2 : '``';
 
+fragment StrikeTilda : '~~';
+
 fragment HtmlElement
     : '<!--' .*? ( '-->' | EOF )
     | '<' .*? ('/>' | '>' | EOF )
@@ -39,7 +41,7 @@ fragment Identifier
 
 fragment NewLine : [\r\n];
 
-HEADER_HASH : ('#')+->mode(LINE_TEXT);
+HEADER_HASH : (('#')+ ' ')->mode(LINE_TEXT);
 LIST_ITEM_MARKER : ListItemMarker->mode(LINE_TEXT);
 
 D_ASTERIX : DoubleAsterix->mode(LINE_TEXT);
@@ -59,6 +61,9 @@ S_SQ_PAR_OPEN : '[' ->type(SQ_PAR_OPEN),mode(LINE_TEXT);
 
 HTML : HtmlElement->mode(LINE_TEXT);
 LETTER : [a-zA-Z]->more, mode(LINE_TEXT);
+
+BLOCK_QUOTE_START : '>'->mode(LINE_TEXT);
+
 NL : NewLine;
 WS : [ ]+;
 

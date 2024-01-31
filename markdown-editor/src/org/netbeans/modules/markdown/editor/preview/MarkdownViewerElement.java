@@ -3,14 +3,11 @@ package org.netbeans.modules.markdown.editor.preview;
 import java.awt.BorderLayout;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Action;
@@ -22,24 +19,19 @@ import javax.swing.JToolBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.StyleConstants;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-import javax.swing.text.html.HTML;
 import javax.swing.text.html.StyleSheet;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.modules.markdown.editor.parser.MarkdownParser;
-import org.netbeans.modules.markdown.editor.parser.MarkdownParserResult;
-import org.netbeans.modules.markdown.editor.parser.astnodes.MarkdownFile;
+import org.netbeans.modules.markdown.syntax.antlr4.MarkdownAntlrLexer;
+import org.netbeans.modules.markdown.syntax.antlr4.MarkdownAntlrParser;
 import org.openide.awt.HtmlBrowser;
 import org.openide.awt.UndoRedo;
 import org.openide.cookies.EditorCookie;
@@ -80,33 +72,6 @@ public class MarkdownViewerElement implements MultiViewElement {
     private transient JEditorPane viewer;
     private transient MultiViewElementCallback callback;
 
-//    static final DataHolder OPTIONS = new MutableDataSet()
-//            .set(Parser.EXTENSIONS, Arrays.asList(
-//                    AnchorLinkExtension.create(),
-//                    TablesExtension.create()
-//            ))
-//
-//            .set(HtmlRenderer.INDENT_SIZE, 2)
-//            .set(HtmlRenderer.RENDER_HEADER_ID, true)
-//            .set(HtmlRenderer.FENCED_CODE_LANGUAGE_CLASS_PREFIX, "")
-//
-//            // JEditorPane search for the name attribute
-//            .set(AnchorLinkExtension.ANCHORLINKS_SET_NAME, true)
-//            .set(AnchorLinkExtension.ANCHORLINKS_SET_ID, false)
-//            .set(AnchorLinkExtension.ANCHORLINKS_ANCHOR_CLASS, "")
-//            .set(AnchorLinkExtension.ANCHORLINKS_TEXT_PREFIX, "")
-//
-//            // Make the table generation SWING Friendly
-//            .set(TablesExtension.COLUMN_SPANS, false)
-//            .set(TablesExtension.MIN_HEADER_ROWS, 1)
-//            .set(TablesExtension.MAX_HEADER_ROWS, 1)
-//            .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
-//            .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
-//            .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-//            .toImmutable();
-//
-//    final Parser parser = Parser.builder(OPTIONS).build();
-//    final HtmlRenderer renderer = HtmlRenderer.builder(OPTIONS).build();
     final DocumentListener dl = new DocumentListener() {
         @Override
         public void insertUpdate(DocumentEvent e) {
@@ -227,8 +192,14 @@ public class MarkdownViewerElement implements MultiViewElement {
             try {
                 Rectangle vis = viewer.getVisibleRect();
 
-                MarkdownParserResult result = MarkdownParser.getParserResult(dataObject.getPrimaryFile());
-                String html = result.convertedHtmlText;
+                CharStream cs = CharStreams.fromString(String.valueOf(dataObject.getPrimaryFile().asText()));
+                MarkdownAntlrLexer lexer = new MarkdownAntlrLexer(cs);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                MarkdownAntlrParser ret = new MarkdownAntlrParser(tokens);
+                MdToHtmlConverterListener listener = new MdToHtmlConverterListener();
+                ret.addParseListener(listener);
+                ret.file();
+                String html = listener.convertedHtmlText;
 
                 String stylesheet = getStyleSheetContent("style");
                 Reader htmlReader = new StringReader("<HTML><head><style>" + stylesheet + "</style></head><BODY>" + html + "</BODY></HTML>");

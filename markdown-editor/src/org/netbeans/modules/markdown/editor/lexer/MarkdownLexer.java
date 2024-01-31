@@ -78,8 +78,6 @@ public class MarkdownLexer extends AbstractAntlrLexerBridge<MarkdownAntlrColorin
                 return token(HEADER);
             case MarkdownAntlrColoringLexer.BREAK_LINE:
                 return token(BREAK_LINE);
-            case MarkdownAntlrColoringLexer.BOLD_START:
-            case MarkdownAntlrColoringLexer.BOLD_END:
             case MarkdownAntlrColoringLexer.BOLD:
                 return token(BOLD);
             case MarkdownAntlrColoringLexer.ITALIC:
@@ -90,7 +88,9 @@ public class MarkdownLexer extends AbstractAntlrLexerBridge<MarkdownAntlrColorin
                 return token(BLOCK_CODE);
             case MarkdownAntlrColoringLexer.CODE:
                 return token(CODE);
-            case MarkdownAntlrColoringLexer.LI_PRE_WS:
+            case MarkdownAntlrColoringLexer.BLOCK_QUOTE_START:
+                return token(BLOCK_QUOTE);
+            case MarkdownAntlrColoringLexer.LIST_ITEM_MARKER:
                 return token(LI);
             case MarkdownAntlrColoringLexer.HYPER_LINK_LABEL:
                 return token(HYPER_LINK_LABEL);
@@ -99,6 +99,11 @@ public class MarkdownLexer extends AbstractAntlrLexerBridge<MarkdownAntlrColorin
             case MarkdownAntlrColoringLexer.NL:
                 return token(NEWLINE);
             case MarkdownAntlrColoringLexer.RAW_TEXT:
+            case MarkdownAntlrColoringLexer.SQ_PAR_OPEN:
+            case MarkdownAntlrColoringLexer.SQ_PAR_CLOSE:
+            case MarkdownAntlrColoringLexer.R_PAR_OPEN:
+            case MarkdownAntlrColoringLexer.R_PAR_CLOSE:
+            case MarkdownAntlrColoringLexer.EXCL:
                 return token(RAW_TEXT);
             default:
                 return token(ERROR);
