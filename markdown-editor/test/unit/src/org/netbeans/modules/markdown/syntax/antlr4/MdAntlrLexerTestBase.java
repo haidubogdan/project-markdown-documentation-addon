@@ -54,6 +54,12 @@ public class MdAntlrLexerTestBase extends NbTestCase {
 
         for (Token token : tokenStream.getTokens()) {
             switch (token.getType()) {
+                case MarkdownAntlrLexer.TAB:
+                    result.append("TAB ");
+                    break;
+                case MarkdownAntlrLexer.WS:
+                    result.append("WS ");
+                    break;
                 case MarkdownAntlrLexer.SETTEXT_H1_UNDERLINE:
                     result.append("HEADER_DASH1 ");
                     break;
@@ -62,12 +68,12 @@ public class MdAntlrLexerTestBase extends NbTestCase {
                     break;
                 case MarkdownAntlrLexer.LIST_ITEM_MARKER:
                     result.append("LIST ITEM MARKER ");
-                    break;   
+                    break;
                 case MarkdownAntlrLexer.NL:
                     result.append("NEW LINE ");
                     break;
             }
-            
+
             String text = replaceLinesAndTabs(token.getText());
             result.append(text);
             result.append(";");
@@ -76,12 +82,12 @@ public class MdAntlrLexerTestBase extends NbTestCase {
 
         return result.toString();
     }
-    
+
     public static String replaceLinesAndTabs(String input) {
         String escapedString = input;
-        escapedString = escapedString.replaceAll("\n","\\\\n"); //NOI18N
-        escapedString = escapedString.replaceAll("\r","\\\\r"); //NOI18N
-        escapedString = escapedString.replaceAll("\t","\\\\t"); //NOI18N
+        escapedString = escapedString.replaceAll("\n", "\\\\n"); //NOI18N
+        escapedString = escapedString.replaceAll("\r", "\\\\r"); //NOI18N
+        escapedString = escapedString.replaceAll("\t", "\\\\t"); //NOI18N
         return escapedString;
     }
 }

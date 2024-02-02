@@ -30,6 +30,7 @@ fragment ListItemMarker
 ;
 
 fragment DoubleAsterix : '**' ;
+fragment DoubleUnderline : '__' ;
 fragment SgAsterix : '*' ;
 fragment StrikeTilda : '~~';
 
@@ -51,7 +52,7 @@ fragment Label
     ;
 
 fragment Url
-    : '(' ('http:' | 'https:')? [/a-zA-Z0-9-_\u0080-\ufffe.#]+ ')'
+    : '(' ('http:' | 'https:')? [/a-zA-Z0-9-_\u0080-\ufffe.#?&]+ ')'
     ;
 fragment NewLine : [\r\n];
 
@@ -60,6 +61,7 @@ LIST_ITEM_MARKER : ListItemMarker->mode(LINE_TEXT);
 
 HORIZONTAL_RULE : ('***')+[*]*;
 D_ASTERIX : DoubleAsterix->more,pushMode(INSIDE_BOLD);
+D_UNDERLINE : DoubleUnderline->more,pushMode(INSIDE_BOLD_U);
 S_ASTERIX : SgAsterix->mode(LINE_TEXT);
 ITALIC_U : '_' ->more, pushMode(INSIDE_ITALIC_U);
 STRIKE_TILDA : StrikeTilda ->more, pushMode(INSIDE_STRIKETHROUGH);
@@ -101,6 +103,7 @@ R_PAR_OPEN : '(';
 R_PAR_CLOSE : ')';
 
 LINE_D_ASTERIX : DoubleAsterix->more,pushMode(INSIDE_BOLD);
+LINE_D_UNDERLINE : DoubleUnderline->more,pushMode(INSIDE_BOLD_U);
 LINE_S_ASTERIX : SgAsterix->more,pushMode(INSIDE_ITALIC);
 LINE_ITALIC_U : '_'->more,pushMode(INSIDE_ITALIC_U);
 LINE_BACKTICK_3 : Backtick_3->more, pushMode(INSIDE_BLOCK_CODE);
@@ -121,6 +124,15 @@ BOLD_NL : NewLine ->type(NL), popMode;
 
 BOLD_EOF : EOF->type(HTML), popMode;
 BOLD_RAW_TEXT : . ->more;
+
+//__
+mode INSIDE_BOLD_U;
+
+BOLD_U_EXIT : DoubleUnderline->type(BOLD),mode(LINE_TEXT);
+BOLD_U_NL : NewLine ->type(NL), popMode;
+
+BOLD_U_EOF : EOF->type(HTML), popMode;
+BOLD_U_RAW_TEXT : . ->more;
 
 //*
 mode INSIDE_ITALIC;

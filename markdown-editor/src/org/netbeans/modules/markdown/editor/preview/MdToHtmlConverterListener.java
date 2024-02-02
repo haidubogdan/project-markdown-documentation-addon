@@ -16,10 +16,18 @@ import org.openide.util.Exceptions;
  * @author bhaidu
  */
 public class MdToHtmlConverterListener extends MarkdownAntlrParserBaseListener {
+
+    public enum ListType {
+        UL, OL
+    };
+
     public String convertedHtmlText = "";
     StringBuilder bufferText = new StringBuilder();
     StringBuilder htmlText = new StringBuilder();
+    int previousTabIdentation = 0;
+    ListType currentListType = null;
     boolean inListItem;
+    boolean listEntered;
 
     @Override
     public void enterFile(MarkdownAntlrParser.FileContext context) {
@@ -144,8 +152,23 @@ public class MdToHtmlConverterListener extends MarkdownAntlrParserBaseListener {
     }
 
     @Override
+    public void enterBlockQuote(MarkdownAntlrParser.BlockQuoteContext context) {
+        htmlText.append("<blockquote>\n");
+    }
+
+    @Override
+    public void exitBlockQuote(MarkdownAntlrParser.BlockQuoteContext context) {
+        htmlText.append("</blockquote>\n");
+    }
+
+    @Override
     public void exitBreakLine(MarkdownAntlrParser.BreakLineContext context) {
         htmlText.append("<hr>\n");
+    }
+
+    @Override
+    public void exitBr(MarkdownAntlrParser.BrContext context) {
+        bufferText.append("<br>\n");
     }
 
     @Override
@@ -189,17 +212,24 @@ public class MdToHtmlConverterListener extends MarkdownAntlrParserBaseListener {
 
     @Override
     public void enterList(MarkdownAntlrParser.ListContext context) {
-        htmlText.append("<ul>\n");
+        listEntered = true;
     }
 
     @Override
     public void exitList(MarkdownAntlrParser.ListContext context) {
-        htmlText.append("</ul>\n");
+        listEntered = false;
+        String ulType = currentListType == ListType.OL ? "ol" : "ul";
+        htmlText.append("</" + ulType + ">\n");
     }
 
     @Override
     public void enterListItem(MarkdownAntlrParser.ListItemContext context) {
         inListItem = true;
+        if (previousTabIdentation > 0) {
+            String ulType = currentListType == ListType.OL ? "ol" : "ul";
+            htmlText.append("</" + ulType + ">\n");
+            previousTabIdentation = 0;
+        }
     }
 
     @Override
@@ -207,6 +237,32 @@ public class MdToHtmlConverterListener extends MarkdownAntlrParserBaseListener {
         inListItem = false;
         if (bufferText.length() == 0) {
             return;
+        }
+
+        setCurrentListTypeMarker(context.LIST_ITEM_MARKER().getText());
+        if (listEntered) {
+            listEntered = false;
+            String ulType = currentListType == ListType.OL ? "ol" : "ul";
+            htmlText.append("<" + ulType + ">\n");
+        }
+        htmlText.append("    <li>");
+        htmlText.append(bufferText);
+        bufferText.setLength(0);
+        htmlText.append("</li>\n");
+    }
+
+    @Override
+    public void exitNestedListItem(MarkdownAntlrParser.NestedListItemContext context) {
+        inListItem = false;
+        if (bufferText.length() == 0) {
+            return;
+        }
+        setCurrentListTypeMarker(context.LIST_ITEM_MARKER().getText());
+        int tabIndentation = context.TAB().size();
+        if (tabIndentation != previousTabIdentation) {
+            String ulType = currentListType == ListType.OL ? "ol" : "ul";
+            htmlText.append("\n<" + ulType + ">\n\t");
+            previousTabIdentation = tabIndentation;
         }
         htmlText.append("    <li>");
         htmlText.append(bufferText);
@@ -251,6 +307,17 @@ public class MdToHtmlConverterListener extends MarkdownAntlrParserBaseListener {
             } catch (IOException e) {
                 exception.addSuppressed(e);
             }
+        }
+    }
+
+    private void setCurrentListTypeMarker(String listMarker) {
+        //test .[number]
+        char secondChar = listMarker.charAt(1);
+
+        if (Character.isDigit(secondChar)) {
+            currentListType = ListType.OL;
+        } else {
+            currentListType = ListType.UL;
         }
     }
 }

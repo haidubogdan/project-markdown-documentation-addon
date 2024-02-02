@@ -70,6 +70,16 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitListItem(MarkdownAntlrParser.ListItemContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#nestedListItem}.
+	 * @param ctx the parse tree
+	 */
+	void enterNestedListItem(MarkdownAntlrParser.NestedListItemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#nestedListItem}.
+	 * @param ctx the parse tree
+	 */
+	void exitNestedListItem(MarkdownAntlrParser.NestedListItemContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#header}.
 	 * @param ctx the parse tree
 	 */
@@ -190,6 +200,16 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 */
 	void exitBlockCode(MarkdownAntlrParser.BlockCodeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#blockQuote}.
+	 * @param ctx the parse tree
+	 */
+	void enterBlockQuote(MarkdownAntlrParser.BlockQuoteContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#blockQuote}.
+	 * @param ctx the parse tree
+	 */
+	void exitBlockQuote(MarkdownAntlrParser.BlockQuoteContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#codeText}.
 	 * @param ctx the parse tree
 	 */
@@ -209,6 +229,16 @@ public interface MarkdownAntlrParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNl(MarkdownAntlrParser.NlContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MarkdownAntlrParser#br}.
+	 * @param ctx the parse tree
+	 */
+	void enterBr(MarkdownAntlrParser.BrContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MarkdownAntlrParser#br}.
+	 * @param ctx the parse tree
+	 */
+	void exitBr(MarkdownAntlrParser.BrContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MarkdownAntlrParser#link}.
 	 * @param ctx the parse tree

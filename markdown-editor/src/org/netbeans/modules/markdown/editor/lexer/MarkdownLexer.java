@@ -76,6 +76,7 @@ public class MarkdownLexer extends AbstractAntlrLexerBridge<MarkdownAntlrColorin
                 return token(HEADER);
             case MarkdownAntlrColoringLexer.H2_DASHES:
                 return token(HEADER);
+            case MarkdownAntlrColoringLexer.HORIZONTAL_RULE:
             case MarkdownAntlrColoringLexer.BREAK_LINE:
                 return token(BREAK_LINE);
             case MarkdownAntlrColoringLexer.BOLD:

@@ -91,6 +91,18 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNestedListItem(MarkdownAntlrParser.NestedListItemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNestedListItem(MarkdownAntlrParser.NestedListItemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterHeader(MarkdownAntlrParser.HeaderContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -235,6 +247,18 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBlockQuote(MarkdownAntlrParser.BlockQuoteContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBlockQuote(MarkdownAntlrParser.BlockQuoteContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCodeText(MarkdownAntlrParser.CodeTextContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -254,6 +278,18 @@ public class MarkdownAntlrParserBaseListener implements MarkdownAntlrParserListe
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNl(MarkdownAntlrParser.NlContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBr(MarkdownAntlrParser.BrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBr(MarkdownAntlrParser.BrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

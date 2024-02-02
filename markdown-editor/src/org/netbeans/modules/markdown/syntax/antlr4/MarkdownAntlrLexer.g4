@@ -8,6 +8,7 @@ options { superClass = LexerAdaptor; }
  
 tokens { 
  NL,
+ BR,
  RAW_TEXT,
  HTML,
  WS,
@@ -17,9 +18,10 @@ tokens {
 }
   
 fragment ListItemMarker
-    : ([ \t]* '- ')
-    | ([ \t]* '* ')
-    | ([ \t]* [0-9]+ '. ')
+    : ('- ')
+    | ('* ')
+    | ('+ ')
+    | ([0-9]+ '. ')
     ;
 
 fragment DoubleAsterix : '**' ;
@@ -42,6 +44,7 @@ fragment Identifier
 fragment NewLine : [\r\n];
 
 HEADER_HASH : (('#')+ ' ')->mode(LINE_TEXT);
+
 LIST_ITEM_MARKER : ListItemMarker->mode(LINE_TEXT);
 
 D_ASTERIX : DoubleAsterix->mode(LINE_TEXT);
@@ -54,7 +57,7 @@ SETTEXT_H1_UNDERLINE : ('=')+ [ ]*;
 SETTEXT_H2_UNDERLINE : ('-')+ [ ]*;
 
 HORIZONTAL_RULE_HYPHEN : (' ')* ('-')+ (' ')* ('-')+ (' ')* ('-')+ [ -]*;
-HORIZONTAL_RULE : ('***')+[*]*;
+HORIZONTAL_RULE : ('***')+[*]* | ('___')+[_]*;
 
 EXCL : '!' ->mode(LINE_TEXT);
 S_SQ_PAR_OPEN : '[' ->type(SQ_PAR_OPEN),mode(LINE_TEXT);
@@ -62,10 +65,12 @@ S_SQ_PAR_OPEN : '[' ->type(SQ_PAR_OPEN),mode(LINE_TEXT);
 HTML : HtmlElement->mode(LINE_TEXT);
 LETTER : [a-zA-Z]->more, mode(LINE_TEXT);
 
-BLOCK_QUOTE_START : '>'->mode(LINE_TEXT);
+//skipping any mode
+BLOCK_QUOTE_START : '> ';
 
-NL : NewLine;
-WS : [ ]+;
+START_NL : NewLine;
+TAB : ('    ');
+WS : [ ];
 
 RAW_TEXT : . ;
 
@@ -83,6 +88,7 @@ LINE_BACKTICK_3 : Backtick_3->type(BACKTICK_3);
 LINE_BACKTICK_2 : Backtick_2->type(BACKTICK_2);
 LINE_HTML : HtmlElement->type(HTML);
 IDENTIFIER : Identifier;
+LINE_BR : ('  ' NewLine)->type(BR);
 LINE_NL : NewLine->type(NL),mode(DEFAULT_MODE);
 LINE_WS : [ ]+->type(WS);
 LINE_RAW_TEXT : . ->type(RAW_TEXT);
